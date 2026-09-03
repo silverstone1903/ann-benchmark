@@ -1,0 +1,15 @@
+engine: weaviate
+
+health_check:
+  host: localhost
+  port: 8080
+  timeout_s: 90
+
+index:
+  type: hnsw
+  m: 16
+  ef_construction: 200
+
+search_sweep:
+  param_name: ef
+  values: [10, 20, 40, 80, 160]

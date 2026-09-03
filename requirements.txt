@@ -1,0 +1,20 @@
+# Core deps for steps 1-6 (dataset prep, Ollama embeddings, ground truth, pgvector reference engine).
+# Engine-specific client libs (redis, elasticsearch-py, qdrant-client, weaviate-client, chromadb,
+# fastapi/uvicorn for the faiss/annoy wrapper services) are added incrementally in
+# engines/<name>/requirements.txt when that engine is implemented, per the "not all at once" plan.
+#
+# mamba/conda-forge match-spec syntax (pip extras like `psycopg[binary]` aren't valid here).
+# Install into the existing env with:
+#   mamba install -n gpt -c conda-forge --file requirements.txt
+#   pip install pgvector>=0.2   # no conda-forge package for this one
+
+datasets>=2.19
+pandas>=2.2
+pyarrow>=16.0
+numpy>=1.26
+faiss-cpu>=1.8
+requests>=2.31
+tqdm>=4.66
+psycopg>=3.1
+pyyaml>=6.0
+plotnine>=0.13

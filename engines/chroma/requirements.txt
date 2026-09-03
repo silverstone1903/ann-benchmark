@@ -1,0 +1,4 @@
+# Pinned tight: engines/chroma/adapter.py is written against 1.5.9's actual API (verified from
+# its GitHub tag) — a version bump here needs the adapter re-checked against that tag, not just
+# a wider pin (the client/server API has already changed shape once between 0.6.3 and 1.5.9).
+chromadb==1.5.9

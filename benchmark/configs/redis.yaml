@@ -1,0 +1,15 @@
+engine: redis
+
+health_check:
+  host: localhost
+  port: 6379
+  timeout_s: 60
+
+index:
+  type: hnsw
+  m: 16
+  ef_construction: 200
+
+search_sweep:
+  param_name: ef_runtime
+  values: [10, 20, 40, 80, 160]

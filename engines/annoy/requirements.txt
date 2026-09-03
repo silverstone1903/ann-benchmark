@@ -1,0 +1,2 @@
+# PyPI name is "annoy"; the conda-forge feedstock is named "python-annoy" (same `import annoy`).
+annoy>=1.17

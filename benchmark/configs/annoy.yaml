@@ -1,0 +1,9 @@
+engine: annoy
+
+index:
+  type: annoy_trees
+  n_trees: 50
+
+search_sweep:
+  param_name: search_k
+  values: [100, 200, 500, 1000, 2000]

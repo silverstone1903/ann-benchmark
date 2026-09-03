@@ -33,6 +33,7 @@ from plotnine import (
     scale_y_log10,
     theme,
     theme_minimal,
+    ylim,
 )
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -74,7 +75,9 @@ def plot_snapshot(df: pd.DataFrame) -> None:
     reader had a mental model of the recall/latency tradeoff.
     """
     mid_rank = int(df["sweep_rank"].median())
-    snap = df[df["sweep_rank"] == mid_rank][["engine", "recall_at_k", "p50_ms", "qps_c1"]].copy()
+    snap = df[df["sweep_rank"] == mid_rank][
+        ["engine", "recall_at_k", "p50_ms", "qps_c1"]
+    ].copy()
     long = snap.melt(id_vars="engine", var_name="metric", value_name="value")
 
     metric_labels = {
@@ -83,7 +86,9 @@ def plot_snapshot(df: pd.DataFrame) -> None:
         "qps_c1": "QPS (1 client)",
     }
     long["metric"] = pd.Categorical(
-        long["metric"].map(metric_labels), categories=list(metric_labels.values()), ordered=True
+        long["metric"].map(metric_labels),
+        categories=list(metric_labels.values()),
+        ordered=True,
     )
 
     p = (
@@ -98,7 +103,9 @@ def plot_snapshot(df: pd.DataFrame) -> None:
             y="",
         )
         + BASE_THEME
-        + theme(axis_text_x=element_text(rotation=40, ha="right"), figure_size=(10, 4.5))
+        + theme(
+            axis_text_x=element_text(rotation=40, ha="right"), figure_size=(10, 4.5)
+        )
     )
     p.save(PLOTS_DIR / "00_snapshot.png", dpi=200, verbose=False)
 
@@ -142,7 +149,10 @@ def plot_recall_by_effort_rank(df: pd.DataFrame) -> None:
         ggplot(df, aes(x="sweep_rank", y="recall_at_k", color="engine", group="engine"))
         + geom_line(size=0.8)
         + geom_point(size=2.3)
-        + scale_x_continuous(breaks=[1, 2, 3, 4, 5], name="search-effort rank (1=lowest, 5=highest, own sweep)")
+        + scale_x_continuous(
+            breaks=[1, 2, 3, 4, 5],
+            name="search-effort rank (1=lowest, 5=highest, own sweep)",
+        )
         + scale_color_manual(values=ENGINE_COLORS, limits=ENGINE_ORDER, name="Engine")
         + labs(
             title="Recall saturation by effort level",
@@ -155,13 +165,20 @@ def plot_recall_by_effort_rank(df: pd.DataFrame) -> None:
 
 
 def plot_build_cost(df: pd.DataFrame) -> None:
-    build_df = df.drop_duplicates("engine")[["engine", "build_time_s", "index_size_bytes"]].copy()
+    build_df = df.drop_duplicates("engine")[
+        ["engine", "build_time_s", "index_size_bytes"]
+    ].copy()
     build_df["index_size_mb"] = build_df["index_size_bytes"] / (1024 * 1024)
 
     p = (
-        ggplot(build_df, aes(x="index_size_mb", y="build_time_s", color="engine", label="engine"))
+        ggplot(
+            build_df,
+            aes(x="index_size_mb", y="build_time_s", color="engine", label="engine"),
+        )
         + geom_point(size=4)
-        + geom_text(nudge_y=0.06, size=9, ha="left", format_string=" {}", show_legend=False)
+        + geom_text(
+            nudge_y=0.06, size=9, ha="left", format_string=" {}", show_legend=False
+        )
         + scale_x_log10(name="on-disk index size, MB (log scale)")
         + scale_color_manual(values=ENGINE_COLORS, limits=ENGINE_ORDER)
         + labs(
@@ -179,15 +196,19 @@ def plot_concurrency_scaling(df: pd.DataFrame) -> None:
     mid_rank = int(df["sweep_rank"].median())
     mid = df[df["sweep_rank"] == mid_rank][["engine", "qps_c1", "qps_c8"]]
     long = mid.melt(id_vars="engine", var_name="concurrency", value_name="qps")
-    long["concurrency"] = long["concurrency"].map({"qps_c1": "1 client", "qps_c8": "8 clients"})
-    long["concurrency"] = pd.Categorical(long["concurrency"], categories=["1 client", "8 clients"], ordered=True)
+    long["concurrency"] = long["concurrency"].map(
+        {"qps_c1": "1 client", "qps_c8": "8 clients"}
+    )
+    long["concurrency"] = pd.Categorical(
+        long["concurrency"], categories=["1 client", "8 clients"], ordered=True
+    )
 
     # Concurrency is an ordinal progression (low->high), not a categorical identity, so it gets
     # a single sequential hue stepped light->dark rather than two arbitrary categorical colors.
     p = (
         ggplot(long, aes(x="engine", y="qps", fill="concurrency"))
         + geom_col(position="dodge", width=0.7)
-        + scale_y_log10(name="QPS (log scale)")
+        + ylim(0, 20000)
         + scale_fill_manual(values=["#86b6ef", "#184f95"], name="Concurrency")
         + labs(
             title="Concurrency scaling",
